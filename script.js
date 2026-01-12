@@ -3,50 +3,33 @@ document.getElementById("calcForm").addEventListener("submit", function (event) 
 
     const secao = Number(document.getElementById("secao").value);
     const quantidade = Number(document.getElementById("quantidade").value);
+    const tipo = document.getElementById("tipo").value;
     const resultado = document.getElementById("resultado");
 
-    if (!secao || !quantidade) {
-        resultado.innerHTML =
-            "<p style='color:red'><strong>Preencha todos os campos.</strong></p>";
+    if (!secao || !quantidade || !tipo) {
+        resultado.innerHTML = "<p style='color:red'><strong>Preencha todos os campos.</strong></p>";
         return;
     }
 
     /* =========================================================
-       DIÂMETRO EXTERNO TÍPICO DOS CABOS (mm)
-       Valores aproximados – referência NEC / fabricantes
+       DIÂMETROS EXTERNOS TÍPICOS (mm)
+       NEC → valores mais enxutos (catálogos UL)
+       NBR → valores mais conservadores (ABNT)
        ========================================================= */
-    const diametroCabo = {
-        1.5: 3.6,
-        2.5: 4.1,
-        4: 4.8,
-        6: 5.5,
-        10: 6.8,
-        16: 7.8,
-        25: 9.2,
-        35: 10.4,
-        50: 12.0,
-        70: 13.7,
-        95: 15.5,
-        120: 17.2,
-        150: 19.0
+
+    const diametros = {
+        PVC:   { NEC: 1.00, NBR: 1.10 },
+        XLPE:  { NEC: 1.05, NBR: 1.15 },
+        EPR:   { NEC: 1.10, NBR: 1.20 }
     };
 
-    const d = diametroCabo[secao];
-    const areaCabo = Math.PI * Math.pow(d / 2, 2);
-    const areaTotalCabos = areaCabo * quantidade;
+    const baseDiametro = {
+        1.5: 3.6,  2.5: 4.1,  4: 4.8,  6: 5.5,
+        10: 6.8,  16: 7.8,  25: 9.2,  35: 10.4,
+        50: 12.0, 70: 13.7, 95: 15.5,
+        120: 17.2, 150: 19.0
+    };
 
-    /* =========================================================
-       LIMITES DE OCUPAÇÃO – NEC CHAPTER 9, TABLE 1
-       ========================================================= */
-    let fatorOcupacao;
-    if (quantidade === 1) fatorOcupacao = 0.53;
-    else if (quantidade === 2) fatorOcupacao = 0.31;
-    else fatorOcupacao = 0.40;
-
-    /* =========================================================
-       ELETRODUTOS PADRÃO (polegadas)
-       Área interna aproximada (mm²)
-       ========================================================= */
     const eletrodutos = [
         { nome: "1/2\"", area: 184 },
         { nome: "3/4\"", area: 304 },
@@ -58,33 +41,64 @@ document.getElementById("calcForm").addEventListener("submit", function (event) 
         { nome: "3\"", area: 3800 }
     ];
 
-    let escolhido = null;
-    let ocupacaoPercentual = 0;
+    function calcular(norm) {
+        const fator = quantidade === 1 ? 0.53 : quantidade === 2 ? 0.31 : 0.40;
 
-    for (let e of eletrodutos) {
-        const areaMaxPermitida = e.area * fatorOcupacao;
-        if (areaTotalCabos <= areaMaxPermitida) {
-            escolhido = e;
-            ocupacaoPercentual = (areaTotalCabos / e.area) * 100;
-            break;
+        const d = baseDiametro[secao] * diametros[tipo][norm];
+        const areaCabos = Math.PI * Math.pow(d / 2, 2) * quantidade;
+
+        let escolhido = null;
+        let ocupacao = 0;
+
+        for (let e of eletrodutos) {
+            if (areaCabos <= e.area * fator) {
+                escolhido = e;
+                ocupacao = (areaCabos / e.area) * 100;
+                break;
+            }
         }
+
+        return {
+            ocupacaoMax: fator * 100,
+            ocupacao,
+            livre: 100 - ocupacao,
+            eletroduto: escolhido ? escolhido.nome : "—"
+        };
     }
 
-    if (!escolhido) {
-        resultado.innerHTML =
-            "<p style='color:red'><strong>Nenhum eletroduto padrão atende a esta configuração.</strong></p>";
-        return;
-    }
-
-    const espacoLivre = 100 - ocupacaoPercentual;
+    const nec = calcular("NEC");
+    const nbr = calcular("NBR");
 
     resultado.innerHTML = `
-        <p><strong>Área total dos cabos:</strong> ${areaTotalCabos.toFixed(1)} mm²</p>
-        <p><strong>Ocupação máxima permitida (NEC):</strong> ${(fatorOcupacao * 100).toFixed(0)}%</p>
-        <p><strong>Ocupação calculada:</strong> ${ocupacaoPercentual.toFixed(1)}%</p>
-        <p><strong>Espaço livre:</strong> ${espacoLivre.toFixed(1)}%</p>
-        <p><strong>Eletroduto mínimo recomendado:</strong>
-            <span style="color:green">${escolhido.nome}</span>
-        </p>
+        <table>
+            <tr>
+                <th>Norma</th>
+                <th>Ocupação Máx.</th>
+                <th>Ocupação Calculada</th>
+                <th>Espaço Livre</th>
+                <th>Eletroduto Recomendado</th>
+            </tr>
+            <tr>
+                <td class="norma">NEC – Chapter 9, Table 1</td>
+                <td>${nec.ocupacaoMax}%</td>
+                <td>${nec.ocupacao.toFixed(1)}%</td>
+                <td>${nec.livre.toFixed(1)}%</td>
+                <td>${nec.eletroduto}</td>
+            </tr>
+            <tr>
+                <td class="norma">NBR 5410</td>
+                <td>${nbr.ocupacaoMax}%</td>
+                <td>${nbr.ocupacao.toFixed(1)}%</td>
+                <td>${nbr.livre.toFixed(1)}%</td>
+                <td>${nbr.eletroduto}</td>
+            </tr>
+        </table>
+
+        <div class="nota">
+            <strong>Nota técnica:</strong> embora os percentuais máximos de ocupação
+            sejam equivalentes na NEC e na NBR 5410, os resultados podem diferir
+            devido aos diâmetros externos adotados para os cabos, que variam conforme
+            o tipo de isolação e critérios normativos.
+        </div>
     `;
 });
