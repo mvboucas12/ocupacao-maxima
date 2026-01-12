@@ -3,13 +3,13 @@ document.addEventListener("DOMContentLoaded", () => {
     const circuitosDiv = document.getElementById("circuitos");
     const addBtn = document.getElementById("addCircuito");
     const form = document.getElementById("calcForm");
+    const resultado = document.getElementById("resultado");
 
     let contador = 0;
 
     addBtn.addEventListener("click", adicionarCircuito);
     form.addEventListener("submit", calcularTudo);
 
-    // adiciona o primeiro circuito automaticamente
     adicionarCircuito();
 
     function adicionarCircuito() {
@@ -19,6 +19,7 @@ document.addEventListener("DOMContentLoaded", () => {
         div.className = "circuito";
 
         div.innerHTML = `
+            <button type="button" class="remover">✖</button>
             <h3>Circuito ${contador}</h3>
 
             <label>Seção do cabo (mm²)</label>
@@ -61,20 +62,16 @@ document.addEventListener("DOMContentLoaded", () => {
             </select>
         `;
 
+        div.querySelector(".remover").onclick = () => {
+            div.remove();
+        };
+
         circuitosDiv.appendChild(div);
     }
 
     function calcularTudo(event) {
         event.preventDefault();
-
-        const secoes = document.querySelectorAll(".secao");
-        const tipos = document.querySelectorAll(".tipo");
-        const qtds = document.querySelectorAll(".qtd");
-        const resultado = document.getElementById("resultado");
-
-        let areaNEC = 0;
-        let areaNBR = 0;
-        let totalCabos = 0;
+        resultado.innerHTML = "";
 
         const baseDiametro = {
             1.5: 3.6, 2.5: 4.1, 4: 4.8, 6: 5.5,
@@ -89,24 +86,24 @@ document.addEventListener("DOMContentLoaded", () => {
             EPR: { NEC: 1.10, NBR: 1.20 }
         };
 
-        for (let i = 0; i < secoes.length; i++) {
-            const s = secoes[i].value;
-            const t = tipos[i].value;
-            const q = Number(qtds[i].value);
+        let areaNEC = 0;
+        let areaNBR = 0;
+        let totalCabos = 0;
+
+        document.querySelectorAll(".circuito").forEach(c => {
+            const s = c.querySelector(".secao").value;
+            const t = c.querySelector(".tipo").value;
+            const q = Number(c.querySelector(".qtd").value);
 
             if (!s || !t || !q) {
-                resultado.innerHTML = "<p style='color:red'><strong>Preencha todos os circuitos.</strong></p>";
-                return;
+                resultado.innerHTML = "<div class='erro'>Todos os campos de todos os circuitos devem ser preenchidos.</div>";
+                throw "Erro";
             }
 
             totalCabos += q;
-
-            const dNEC = baseDiametro[s] * fatorTipo[t].NEC;
-            const dNBR = baseDiametro[s] * fatorTipo[t].NBR;
-
-            areaNEC += Math.PI * Math.pow(dNEC / 2, 2) * q;
-            areaNBR += Math.PI * Math.pow(dNBR / 2, 2) * q;
-        }
+            areaNEC += Math.PI * Math.pow(baseDiametro[s] * fatorTipo[t].NEC / 2, 2) * q;
+            areaNBR += Math.PI * Math.pow(baseDiametro[s] * fatorTipo[t].NBR / 2, 2) * q;
+        });
 
         const fator = totalCabos === 1 ? 0.53 : totalCabos === 2 ? 0.31 : 0.40;
 
@@ -124,17 +121,24 @@ document.addEventListener("DOMContentLoaded", () => {
         function selecionar(area) {
             for (let e of eletrodutos) {
                 if (area <= e.area * fator) {
-                    return {
-                        nome: e.nome,
-                        ocupacao: (area / e.area) * 100
-                    };
+                    return { nome: e.nome, ocupacao: (area / e.area) * 100 };
                 }
             }
-            return { nome: "—", ocupacao: 0 };
+            return null;
         }
 
         const nec = selecionar(areaNEC);
         const nbr = selecionar(areaNBR);
+
+        if (!nec || !nbr) {
+            resultado.innerHTML = `
+                <div class="erro">
+                    O somatório das seções e quantidades de cabos ultrapassa a ocupação máxima permitida
+                    pelos critérios normativos considerados. Recomenda-se a adoção de eletroduto de maior
+                    diâmetro ou a redistribuição dos circuitos.
+                </div>`;
+            return;
+        }
 
         resultado.innerHTML = `
             <table>
@@ -149,22 +153,29 @@ document.addEventListener("DOMContentLoaded", () => {
                     <td><strong>NEC</strong></td>
                     <td>${(fator*100).toFixed(0)}%</td>
                     <td>${nec.ocupacao.toFixed(1)}%</td>
-                    <td>${(100 - nec.ocupacao).toFixed(1)}%</td>
+                    <td>${(100-nec.ocupacao).toFixed(1)}%</td>
                     <td>${nec.nome}</td>
                 </tr>
                 <tr>
                     <td><strong>NBR 5410</strong></td>
                     <td>${(fator*100).toFixed(0)}%</td>
                     <td>${nbr.ocupacao.toFixed(1)}%</td>
-                    <td>${(100 - nbr.ocupacao).toFixed(1)}%</td>
+                    <td>${(100-nbr.ocupacao).toFixed(1)}%</td>
                     <td>${nbr.nome}</td>
                 </tr>
             </table>
 
             <div class="nota">
-                <strong>Nota técnica:</strong> o cálculo considera múltiplos circuitos
-                compartilhando o mesmo eletroduto, com somatório das áreas dos cabos,
-                conforme NEC (Chapter 9) e NBR 5410.
+                <strong>Notas técnicas:</strong><br><br>
+                • A ocupação máxima do eletroduto segue a NEC – Chapter 9, Table 1, e a NBR 5410,
+                item 6.2.11.1, que estabelecem percentuais máximos conforme o número de condutores.<br><br>
+                • As diferenças entre os resultados NEC e NBR decorrem principalmente dos diâmetros
+                externos adotados para os cabos, variáveis conforme o tipo de isolação e critérios
+                construtivos (NEC Article 310; NBR 5410, itens 6.2.5 e 6.2.11).<br><br>
+                • Cabos com isolação XLPE ou EPR tendem a apresentar maiores diâmetros externos,
+                resultando em ocupações superiores quando comparados a cabos PVC equivalentes.<br><br>
+                • Recomenda-se sempre a verificação dos diâmetros reais junto aos catálogos dos
+                fabricantes para projetos executivos.
             </div>
         `;
     }

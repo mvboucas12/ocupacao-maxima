@@ -1,6 +1,4 @@
-* {
-    box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
     font-family: Arial, Helvetica, sans-serif;
@@ -9,7 +7,7 @@ body {
 }
 
 .container {
-    max-width: 850px;
+    max-width: 900px;
     margin: 40px auto;
     background: #fff;
     padding: 25px 30px;
@@ -17,9 +15,7 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
 }
 
-h1 {
-    text-align: center;
-}
+h1 { text-align: center; }
 
 .circuito {
     border: 1px solid #ddd;
@@ -27,11 +23,24 @@ h1 {
     margin-top: 15px;
     border-radius: 6px;
     background: #fafafa;
+    position: relative;
 }
 
-.circuito h3 {
-    margin-top: 0;
+.circuito h3 { margin-top: 0; }
+
+.remover {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #c0392b;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    cursor: pointer;
+    border-radius: 4px;
 }
+
+.remover:hover { background: #922b21; }
 
 label {
     font-weight: bold;
@@ -59,17 +68,9 @@ button {
     color: white;
 }
 
-#addCircuito:hover {
-    background-color: #555;
-}
-
 button[type="submit"] {
     background-color: #0057b8;
     color: white;
-}
-
-button[type="submit"]:hover {
-    background-color: #003f88;
 }
 
 table {
@@ -97,4 +98,13 @@ td {
     background: #eef3fa;
     border-left: 4px solid #0057b8;
     font-size: 13px;
+}
+
+.erro {
+    margin-top: 25px;
+    padding: 15px;
+    background: #fdecea;
+    color: #b00020;
+    border-left: 5px solid #b00020;
+    font-weight: bold;
 }
