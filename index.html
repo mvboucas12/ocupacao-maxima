@@ -1,33 +1,39 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Ocupação Máxima de Eletrodutos</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
+<form id="calcForm">
 
-<div class="container">
-    <h1>Ocupação Máxima de Eletrodutos</h1>
-    <h2>Baseado na NEC (National Electrical Code – Chapter 9, Table 1)</h2>
+    <label>
+        Seção nominal do cabo (mm²):
+        <select id="secao">
+            <option value="">Selecione</option>
+            <option value="1.5">1,5</option>
+            <option value="2.5">2,5</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="10">10</option>
+            <option value="16">16</option>
+            <option value="25">25</option>
+            <option value="35">35</option>
+            <option value="50">50</option>
+            <option value="70">70</option>
+            <option value="95">95</option>
+            <option value="120">120</option>
+            <option value="150">150</option>
+        </select>
+    </label>
 
-    <form id="calcForm">
+    <label>
+        Quantidade de cabos:
+        <select id="quantidade">
+            <option value="">Selecione</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+        </select>
+    </label>
 
-        <label>
-            Seção do condutor (mm²):
-            <select id="secao">
-                <option value="">Selecione</option>
-                <option value="1.5">1,5</option>
-                <option value="2.5">2,5</option>
-                <option value="4">4</option>
-                <option value="6">6</option>
-                <option value="10">10</option>
-                <option value="16">16</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="70">70</option>
-                <option value="95">95</option>
-                <option value="120">120</option>
-                <option value="150">150</option>
-            </select>
-        </label>
+    <button type="submit">Calcular</button>
+</form>
