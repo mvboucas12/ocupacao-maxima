@@ -1,34 +1,111 @@
-document.getElementById("calcForm").addEventListener("submit", function (event) {
+const circuitosDiv = document.getElementById("circuitos");
+const addBtn = document.getElementById("addCircuito");
+
+let contador = 0;
+
+addBtn.addEventListener("click", adicionarCircuito);
+document.getElementById("calcForm").addEventListener("submit", calcularTudo);
+
+// adiciona o primeiro circuito automaticamente
+adicionarCircuito();
+
+function adicionarCircuito() {
+    contador++;
+
+    const div = document.createElement("div");
+    div.className = "circuito";
+
+    div.innerHTML = `
+        <h3>Circuito ${contador}</h3>
+
+        <label>Seção do cabo (mm²)</label>
+        <select class="secao">
+            <option value="">Selecione</option>
+            <option value="1.5">1,5</option>
+            <option value="2.5">2,5</option>
+            <option value="4">4</option>
+            <option value="6">6</option>
+            <option value="10">10</option>
+            <option value="16">16</option>
+            <option value="25">25</option>
+            <option value="35">35</option>
+            <option value="50">50</option>
+            <option value="70">70</option>
+            <option value="95">95</option>
+            <option value="120">120</option>
+            <option value="150">150</option>
+        </select>
+
+        <label>Tipo de cabo</label>
+        <select class="tipo">
+            <option value="">Selecione</option>
+            <option value="PVC">PVC 70 °C</option>
+            <option value="XLPE">XLPE 90 °C</option>
+            <option value="EPR">EPR 90 °C</option>
+        </select>
+
+        <label>Quantidade de cabos</label>
+        <select class="qtd">
+            <option value="">Selecione</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="8">8</option>
+            <option value="10">10</option>
+        </select>
+    `;
+
+    circuitosDiv.appendChild(div);
+}
+
+function calcularTudo(event) {
     event.preventDefault();
 
-    const secao = Number(document.getElementById("secao").value);
-    const quantidade = Number(document.getElementById("quantidade").value);
-    const tipo = document.getElementById("tipo").value;
+    const secoes = document.querySelectorAll(".secao");
+    const tipos = document.querySelectorAll(".tipo");
+    const qtds = document.querySelectorAll(".qtd");
     const resultado = document.getElementById("resultado");
 
-    if (!secao || !quantidade || !tipo) {
-        resultado.innerHTML = "<p style='color:red'><strong>Preencha todos os campos.</strong></p>";
-        return;
-    }
-
-    /* =========================================================
-       DIÂMETROS EXTERNOS TÍPICOS (mm)
-       NEC → valores mais enxutos (catálogos UL)
-       NBR → valores mais conservadores (ABNT)
-       ========================================================= */
-
-    const diametros = {
-        PVC:   { NEC: 1.00, NBR: 1.10 },
-        XLPE:  { NEC: 1.05, NBR: 1.15 },
-        EPR:   { NEC: 1.10, NBR: 1.20 }
-    };
+    let areaTotalNEC = 0;
+    let areaTotalNBR = 0;
+    let totalCabos = 0;
 
     const baseDiametro = {
-        1.5: 3.6,  2.5: 4.1,  4: 4.8,  6: 5.5,
-        10: 6.8,  16: 7.8,  25: 9.2,  35: 10.4,
+        1.5: 3.6, 2.5: 4.1, 4: 4.8, 6: 5.5,
+        10: 6.8, 16: 7.8, 25: 9.2, 35: 10.4,
         50: 12.0, 70: 13.7, 95: 15.5,
         120: 17.2, 150: 19.0
     };
+
+    const fatorTipo = {
+        PVC: { NEC: 1.00, NBR: 1.10 },
+        XLPE: { NEC: 1.05, NBR: 1.15 },
+        EPR: { NEC: 1.10, NBR: 1.20 }
+    };
+
+    for (let i = 0; i < secoes.length; i++) {
+        const s = secoes[i].value;
+        const t = tipos[i].value;
+        const q = Number(qtds[i].value);
+
+        if (!s || !t || !q) {
+            resultado.innerHTML = "<p style='color:red'><strong>Preencha todos os circuitos.</strong></p>";
+            return;
+        }
+
+        totalCabos += q;
+
+        const dNEC = baseDiametro[s] * fatorTipo[t].NEC;
+        const dNBR = baseDiametro[s] * fatorTipo[t].NBR;
+
+        areaTotalNEC += Math.PI * Math.pow(dNEC / 2, 2) * q;
+        areaTotalNBR += Math.PI * Math.pow(dNBR / 2, 2) * q;
+    }
+
+    const fator = totalCabos === 1 ? 0.53 : totalCabos === 2 ? 0.31 : 0.40;
 
     const eletrodutos = [
         { nome: "1/2\"", area: 184 },
@@ -41,33 +118,20 @@ document.getElementById("calcForm").addEventListener("submit", function (event) 
         { nome: "3\"", area: 3800 }
     ];
 
-    function calcular(norm) {
-        const fator = quantidade === 1 ? 0.53 : quantidade === 2 ? 0.31 : 0.40;
-
-        const d = baseDiametro[secao] * diametros[tipo][norm];
-        const areaCabos = Math.PI * Math.pow(d / 2, 2) * quantidade;
-
-        let escolhido = null;
-        let ocupacao = 0;
-
+    function selecionar(areaCabos) {
         for (let e of eletrodutos) {
             if (areaCabos <= e.area * fator) {
-                escolhido = e;
-                ocupacao = (areaCabos / e.area) * 100;
-                break;
+                return {
+                    eletroduto: e.nome,
+                    ocupacao: (areaCabos / e.area) * 100
+                };
             }
         }
-
-        return {
-            ocupacaoMax: fator * 100,
-            ocupacao,
-            livre: 100 - ocupacao,
-            eletroduto: escolhido ? escolhido.nome : "—"
-        };
+        return { eletroduto: "—", ocupacao: 0 };
     }
 
-    const nec = calcular("NEC");
-    const nbr = calcular("NBR");
+    const nec = selecionar(areaTotalNEC);
+    const nbr = selecionar(areaTotalNBR);
 
     resultado.innerHTML = `
         <table>
@@ -79,26 +143,25 @@ document.getElementById("calcForm").addEventListener("submit", function (event) 
                 <th>Eletroduto Recomendado</th>
             </tr>
             <tr>
-                <td class="norma">NEC – Chapter 9, Table 1</td>
-                <td>${nec.ocupacaoMax}%</td>
+                <td><strong>NEC</strong></td>
+                <td>${(fator*100).toFixed(0)}%</td>
                 <td>${nec.ocupacao.toFixed(1)}%</td>
-                <td>${nec.livre.toFixed(1)}%</td>
+                <td>${(100 - nec.ocupacao).toFixed(1)}%</td>
                 <td>${nec.eletroduto}</td>
             </tr>
             <tr>
-                <td class="norma">NBR 5410</td>
-                <td>${nbr.ocupacaoMax}%</td>
+                <td><strong>NBR 5410</strong></td>
+                <td>${(fator*100).toFixed(0)}%</td>
                 <td>${nbr.ocupacao.toFixed(1)}%</td>
-                <td>${nbr.livre.toFixed(1)}%</td>
+                <td>${(100 - nbr.ocupacao).toFixed(1)}%</td>
                 <td>${nbr.eletroduto}</td>
             </tr>
         </table>
 
         <div class="nota">
-            <strong>Nota técnica:</strong> embora os percentuais máximos de ocupação
-            sejam equivalentes na NEC e na NBR 5410, os resultados podem diferir
-            devido aos diâmetros externos adotados para os cabos, que variam conforme
-            o tipo de isolação e critérios normativos.
+            <strong>Nota técnica:</strong> o cálculo considera múltiplos circuitos
+            compartilhando o mesmo eletroduto, com somatório das áreas dos cabos,
+            conforme critérios da NEC (Chapter 9) e NBR 5410.
         </div>
     `;
-});
+}

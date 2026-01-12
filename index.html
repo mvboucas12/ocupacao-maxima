@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Ocupação Máxima de Eletrodutos</title>
+    <title>Ocupação de Eletrodutos – Múltiplos Circuitos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -13,45 +13,9 @@
 
     <form id="calcForm">
 
-        <label for="secao">Seção nominal do cabo (mm²)</label>
-        <select id="secao">
-            <option value="">Selecione</option>
-            <option value="1.5">1,5</option>
-            <option value="2.5">2,5</option>
-            <option value="4">4</option>
-            <option value="6">6</option>
-            <option value="10">10</option>
-            <option value="16">16</option>
-            <option value="25">25</option>
-            <option value="35">35</option>
-            <option value="50">50</option>
-            <option value="70">70</option>
-            <option value="95">95</option>
-            <option value="120">120</option>
-            <option value="150">150</option>
-        </select>
+        <div id="circuitos"></div>
 
-        <label for="tipo">Tipo de cabo / isolação</label>
-        <select id="tipo">
-            <option value="">Selecione</option>
-            <option value="PVC">PVC 70 °C (NBR NM / BWF)</option>
-            <option value="XLPE">XLPE 90 °C</option>
-            <option value="EPR">EPR 90 °C</option>
-        </select>
-
-        <label for="quantidade">Quantidade de cabos</label>
-        <select id="quantidade">
-            <option value="">Selecione</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="8">8</option>
-            <option value="10">10</option>
-        </select>
-
+        <button type="button" id="addCircuito">➕ Adicionar circuito</button>
         <button type="submit">Calcular</button>
     </form>
 

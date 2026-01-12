@@ -6,13 +6,12 @@ body {
     font-family: Arial, Helvetica, sans-serif;
     background-color: #f2f4f8;
     margin: 0;
-    padding: 0;
 }
 
 .container {
-    max-width: 750px;
+    max-width: 850px;
     margin: 40px auto;
-    background-color: #ffffff;
+    background: #fff;
     padding: 25px 30px;
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
@@ -20,55 +19,69 @@ body {
 
 h1 {
     text-align: center;
-    margin-bottom: 25px;
 }
 
-form {
-    display: flex;
-    flex-direction: column;
+.circuito {
+    border: 1px solid #ddd;
+    padding: 15px;
+    margin-top: 15px;
+    border-radius: 6px;
+    background: #fafafa;
+}
+
+.circuito h3 {
+    margin-top: 0;
 }
 
 label {
-    margin-top: 15px;
     font-weight: bold;
+    display: block;
+    margin-top: 10px;
 }
 
 select {
-    margin-top: 6px;
-    padding: 8px;
+    width: 100%;
+    padding: 7px;
+    margin-top: 5px;
 }
 
 button {
-    margin-top: 25px;
+    margin-top: 20px;
     padding: 10px;
-    font-size: 16px;
-    background-color: #0057b8;
-    color: #ffffff;
+    font-size: 15px;
+    cursor: pointer;
     border: none;
     border-radius: 5px;
-    cursor: pointer;
 }
 
-button:hover {
+#addCircuito {
+    background-color: #777;
+    color: white;
+}
+
+#addCircuito:hover {
+    background-color: #555;
+}
+
+button[type="submit"] {
+    background-color: #0057b8;
+    color: white;
+}
+
+button[type="submit"]:hover {
     background-color: #003f88;
-}
-
-/* ===== RESULTADOS ===== */
-
-#resultado {
-    margin-top: 30px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 25px;
     font-size: 14px;
 }
 
 th {
     background-color: #0057b8;
-    color: #ffffff;
+    color: white;
     padding: 10px;
 }
 
@@ -78,14 +91,10 @@ td {
     text-align: center;
 }
 
-.norma {
-    font-weight: bold;
-}
-
 .nota {
     margin-top: 20px;
     padding: 12px;
-    background-color: #eef3fa;
+    background: #eef3fa;
     border-left: 4px solid #0057b8;
     font-size: 13px;
 }
