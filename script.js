@@ -6,13 +6,14 @@ document.getElementById("calcForm").addEventListener("submit", function (event) 
     const resultado = document.getElementById("resultado");
 
     if (!secao || !quantidade) {
-        resultado.innerHTML = "<span style='color:red'>Preencha todos os campos.</span>";
+        resultado.innerHTML =
+            "<p style='color:red'><strong>Preencha todos os campos.</strong></p>";
         return;
     }
 
     /* =========================================================
-       TABELA SIMPLIFICADA – DIÂMETRO EXTERNO DO CABO (mm)
-       Baseada em valores típicos NEC / fabricantes
+       DIÂMETRO EXTERNO TÍPICO DOS CABOS (mm)
+       Valores aproximados – referência NEC / fabricantes
        ========================================================= */
     const diametroCabo = {
         1.5: 3.6,
@@ -30,20 +31,20 @@ document.getElementById("calcForm").addEventListener("submit", function (event) 
         150: 19.0
     };
 
-    const dCabo = diametroCabo[secao];
-    const areaCabo = Math.PI * Math.pow(dCabo / 2, 2);
+    const d = diametroCabo[secao];
+    const areaCabo = Math.PI * Math.pow(d / 2, 2);
     const areaTotalCabos = areaCabo * quantidade;
 
     /* =========================================================
-       LIMITES NEC – CHAPTER 9, TABLE 1
+       LIMITES DE OCUPAÇÃO – NEC CHAPTER 9, TABLE 1
        ========================================================= */
-    let ocupacaoMax;
-    if (quantidade === 1) ocupacaoMax = 0.53;
-    else if (quantidade === 2) ocupacaoMax = 0.31;
-    else ocupacaoMax = 0.40;
+    let fatorOcupacao;
+    if (quantidade === 1) fatorOcupacao = 0.53;
+    else if (quantidade === 2) fatorOcupacao = 0.31;
+    else fatorOcupacao = 0.40;
 
     /* =========================================================
-       ELETRODUTOS PADRONIZADOS (polegadas)
+       ELETRODUTOS PADRÃO (polegadas)
        Área interna aproximada (mm²)
        ========================================================= */
     const eletrodutos = [
@@ -57,8 +58,33 @@ document.getElementById("calcForm").addEventListener("submit", function (event) 
         { nome: "3\"", area: 3800 }
     ];
 
-    let eletrodutoSelecionado = null;
-    let percentualOcupacao = 0;
+    let escolhido = null;
+    let ocupacaoPercentual = 0;
 
     for (let e of eletrodutos) {
-        cons
+        const areaMaxPermitida = e.area * fatorOcupacao;
+        if (areaTotalCabos <= areaMaxPermitida) {
+            escolhido = e;
+            ocupacaoPercentual = (areaTotalCabos / e.area) * 100;
+            break;
+        }
+    }
+
+    if (!escolhido) {
+        resultado.innerHTML =
+            "<p style='color:red'><strong>Nenhum eletroduto padrão atende a esta configuração.</strong></p>";
+        return;
+    }
+
+    const espacoLivre = 100 - ocupacaoPercentual;
+
+    resultado.innerHTML = `
+        <p><strong>Área total dos cabos:</strong> ${areaTotalCabos.toFixed(1)} mm²</p>
+        <p><strong>Ocupação máxima permitida (NEC):</strong> ${(fatorOcupacao * 100).toFixed(0)}%</p>
+        <p><strong>Ocupação calculada:</strong> ${ocupacaoPercentual.toFixed(1)}%</p>
+        <p><strong>Espaço livre:</strong> ${espacoLivre.toFixed(1)}%</p>
+        <p><strong>Eletroduto mínimo recomendado:</strong>
+            <span style="color:green">${escolhido.nome}</span>
+        </p>
+    `;
+});

@@ -1,7 +1,24 @@
-<form id="calcForm">
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Ocupação Máxima de Eletrodutos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <label>
-        Seção nominal do cabo (mm²):
+    <!-- CSS -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1>Ocupação Máxima de Eletrodutos</h1>
+    <h2>Baseado na NEC (National Electrical Code – Chapter 9, Table 1)</h2>
+
+    <form id="calcForm">
+
+        <label for="secao">
+            Seção nominal do cabo (mm²)
+        </label>
         <select id="secao">
             <option value="">Selecione</option>
             <option value="1.5">1,5</option>
@@ -18,10 +35,10 @@
             <option value="120">120</option>
             <option value="150">150</option>
         </select>
-    </label>
 
-    <label>
-        Quantidade de cabos:
+        <label for="quantidade">
+            Quantidade de cabos
+        </label>
         <select id="quantidade">
             <option value="">Selecione</option>
             <option value="1">1</option>
@@ -33,7 +50,15 @@
             <option value="8">8</option>
             <option value="10">10</option>
         </select>
-    </label>
 
-    <button type="submit">Calcular</button>
-</form>
+        <button type="submit">Calcular</button>
+    </form>
+
+    <!-- RESULTADO -->
+    <div id="resultado" class="resultado"></div>
+</div>
+
+<!-- JS -->
+<script src="script.js"></script>
+</body>
+</html>
