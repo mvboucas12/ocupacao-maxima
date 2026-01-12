@@ -48,3 +48,15 @@ button:hover {
     margin-top: 20px;
     font-weight: bold;
 }
+h2 {
+    text-align: center;
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
+}
+
+select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+}

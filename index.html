@@ -2,31 +2,32 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Cálculo de Ocupação Máxima</title>
+    <title>Ocupação Máxima de Eletrodutos</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="container">
-        <h1>Ocupação Máxima</h1>
+<div class="container">
+    <h1>Ocupação Máxima de Eletrodutos</h1>
+    <h2>Baseado na NEC (National Electrical Code – Chapter 9, Table 1)</h2>
 
-        <form id="calcForm">
-            <label>
-                Corrente do Condutor (A):
-                <input type="number" id="corrente" required>
-            </label>
+    <form id="calcForm">
 
-            <label>
-                Seção do Condutor (mm²):
-                <input type="number" id="secao" required>
-            </label>
-
-            <button type="submit">Calcular</button>
-        </form>
-
-        <div id="resultado" class="resultado"></div>
-    </div>
-
-    <script src="script.js"></script>
-</body>
-</html>
+        <label>
+            Seção do condutor (mm²):
+            <select id="secao">
+                <option value="">Selecione</option>
+                <option value="1.5">1,5</option>
+                <option value="2.5">2,5</option>
+                <option value="4">4</option>
+                <option value="6">6</option>
+                <option value="10">10</option>
+                <option value="16">16</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="70">70</option>
+                <option value="95">95</option>
+                <option value="120">120</option>
+                <option value="150">150</option>
+            </select>
+        </label>
