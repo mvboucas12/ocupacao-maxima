@@ -5,26 +5,23 @@ document.addEventListener("DOMContentLoaded", () => {
     const form = document.getElementById("calcForm");
     const resultado = document.getElementById("resultado");
 
-    let contador = 0;
-
     addBtn.addEventListener("click", adicionarCircuito);
     form.addEventListener("submit", calcularTudo);
 
     adicionarCircuito();
 
     function adicionarCircuito() {
-        contador++;
 
         const div = document.createElement("div");
         div.className = "circuito";
 
         div.innerHTML = `
             <button type="button" class="remover">✖</button>
-            <h3>Circuito ${contador}</h3>
+            <h3></h3>
 
-            <label>Seção do cabo (mm²)</label>
+            <label>Cable Size (mm²)</label>
             <select class="secao">
-                <option value="">Selecione</option>
+                <option value="">Select</option>
                 <option value="1.5">1,5</option>
                 <option value="2.5">2,5</option>
                 <option value="4">4</option>
@@ -40,17 +37,17 @@ document.addEventListener("DOMContentLoaded", () => {
                 <option value="150">150</option>
             </select>
 
-            <label>Tipo de cabo</label>
+            <label>Cable Type</label>
             <select class="tipo">
-                <option value="">Selecione</option>
+                <option value="">Select</option>
                 <option value="PVC">PVC 70 °C</option>
                 <option value="XLPE">XLPE 90 °C</option>
                 <option value="EPR">EPR 90 °C</option>
             </select>
 
-            <label>Quantidade de cabos</label>
+            <label>Number of Cables</label>
             <select class="qtd">
-                <option value="">Selecione</option>
+                <option value="">Select</option>
                 <option value="1">1</option>
                 <option value="2">2</option>
                 <option value="3">3</option>
@@ -64,9 +61,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
         div.querySelector(".remover").onclick = () => {
             div.remove();
+            atualizarNumeracaoCircuitos();
         };
 
         circuitosDiv.appendChild(div);
+        atualizarNumeracaoCircuitos();
+    }
+
+    function atualizarNumeracaoCircuitos() {
+        const circuitos = document.querySelectorAll(".circuito");
+
+        circuitos.forEach((circuito, index) => {
+            circuito.querySelector("h3").textContent = `Circuit ${index + 1}`;
+
+            const botaoRemover = circuito.querySelector(".remover");
+
+            if (index === 0) {
+                botaoRemover.style.display = "none";
+            } else {
+                botaoRemover.style.display = "block";
+            }
+        });
     }
 
     function calcularTudo(event) {
@@ -96,7 +111,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const q = Number(c.querySelector(".qtd").value);
 
             if (!s || !t || !q) {
-                resultado.innerHTML = "<div class='erro'>Todos os campos de todos os circuitos devem ser preenchidos.</div>";
+                resultado.innerHTML = "<div class='erro'>All fields in all circuits must be completed.</div>";
                 throw "Erro";
             }
 
@@ -133,9 +148,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (!nec || !nbr) {
             resultado.innerHTML = `
                 <div class="erro">
-                    O somatório das seções e quantidades de cabos ultrapassa a ocupação máxima permitida
-                    pelos critérios normativos considerados. Recomenda-se a adoção de eletroduto de maior
-                    diâmetro ou a redistribuição dos circuitos.
+                    The combined cable sizes and quantities exceed the maximum conduit fill
+                    permitted by the applicable code criteria. A larger conduit size or
+                    redistribution of circuits is recommended.
                 </div>`;
             return;
         }
@@ -143,11 +158,11 @@ document.addEventListener("DOMContentLoaded", () => {
         resultado.innerHTML = `
             <table>
                 <tr>
-                    <th>Norma</th>
-                    <th>Ocupação Máx.</th>
-                    <th>Ocupação Calculada</th>
-                    <th>Espaço Livre</th>
-                    <th>Eletroduto Recomendado</th>
+                    <th>Standard</th>
+                    <th>Maximum Fill</th>
+                    <th>Calculated Fill</th>
+                    <th>Free Space</th>
+                    <th>Recommended Conduit</th>
                 </tr>
                 <tr>
                     <td><strong>NEC</strong></td>
@@ -166,16 +181,18 @@ document.addEventListener("DOMContentLoaded", () => {
             </table>
 
             <div class="nota">
-                <strong>Notas técnicas:</strong><br><br>
-                • A ocupação máxima do eletroduto segue a NEC – Chapter 9, Table 1, e a NBR 5410,
-                item 6.2.11.1, que estabelecem percentuais máximos conforme o número de condutores.<br><br>
-                • As diferenças entre os resultados NEC e NBR decorrem principalmente dos diâmetros
-                externos adotados para os cabos, variáveis conforme o tipo de isolação e critérios
-                construtivos (NEC Article 310; NBR 5410, itens 6.2.5 e 6.2.11).<br><br>
-                • Cabos com isolação XLPE ou EPR tendem a apresentar maiores diâmetros externos,
-                resultando em ocupações superiores quando comparados a cabos PVC equivalentes.<br><br>
-                • Recomenda-se sempre a verificação dos diâmetros reais junto aos catálogos dos
-                fabricantes para projetos executivos.
+                <strong>Technical Notes:</strong><br><br>
+                • Maximum conduit fill is based on NEC Chapter 9, Table 1, and NBR 5410,
+                Clause 6.2.11.1, which establish maximum fill percentages according to
+                the number of conductors.<br><br>
+                • Differences between NEC and NBR results arise mainly from the adopted
+                cable outside diameters, which vary according to insulation type and
+                construction criteria (NEC Article 310; NBR 5410 Clauses 6.2.5 and 6.2.11).<br><br>
+                • XLPE and EPR insulated cables generally have larger outside diameters,
+                resulting in higher conduit fill percentages when compared with equivalent
+                PVC insulated cables.<br><br>
+                • Verification of actual cable diameters using manufacturer catalogs is
+                always recommended for detailed engineering design.
             </div>
         `;
     }
