@@ -1,33 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Conduit Fill Calculator – Multiple Circuits</title>
+    <title>Ocupação de Eletrodutos – Múltiplos Circuitos</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="container">
-    <h1>Maximum Conduit Fill</h1>
+    <h1>Ocupação Máxima de Eletrodutos</h1>
 
-    <label>
-        Quantidade de cabos:
-        <select id="quantidade">
-            <option value="">Selecione</option>
-            <option value="1">1</option>
-            <option value="2">2</option>
-            <option value="3">3</option>
-            <option value="4">4</option>
-            <option value="5">5</option>
-            <option value="6">6</option>
-            <option value="8">8</option>
-            <option value="10">10</option>
-        </select>
-    </label>
+    <form id="calcForm">
+        <div id="circuitos"></div>
 
-        <button type="button" id="addCircuito">➕ Add Circuit</button>
-        <button type="submit">Calculate</button>
+        <button type="button" id="addCircuito">➕ Adicionar circuito</button>
+        <button type="submit">Calcular</button>
     </form>
 
     <div id="resultado"></div>
