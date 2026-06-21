@@ -1,24 +1,15 @@
-<form id="calcForm">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conduit Fill Calculator – Multiple Circuits</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
 
-    <label>
-        Seção nominal do cabo (mm²):
-        <select id="secao">
-            <option value="">Selecione</option>
-            <option value="1.5">1,5</option>
-            <option value="2.5">2,5</option>
-            <option value="4">4</option>
-            <option value="6">6</option>
-            <option value="10">10</option>
-            <option value="16">16</option>
-            <option value="25">25</option>
-            <option value="35">35</option>
-            <option value="50">50</option>
-            <option value="70">70</option>
-            <option value="95">95</option>
-            <option value="120">120</option>
-            <option value="150">150</option>
-        </select>
-    </label>
+<div class="container">
+    <h1>Maximum Conduit Fill</h1>
 
     <label>
         Quantidade de cabos:
@@ -35,5 +26,13 @@
         </select>
     </label>
 
-    <button type="submit">Calcular</button>
-</form>
+        <button type="button" id="addCircuito">➕ Add Circuit</button>
+        <button type="submit">Calculate</button>
+    </form>
+
+    <div id="resultado"></div>
+</div>
+
+<script src="script.js" defer></script>
+</body>
+</html>
